@@ -91,12 +91,12 @@ def manage_products_list():
                 if st.button("Modificar", key=f"mod_{produto_id}"):
                     st.session_state["edit_product_id"] = produto_id
                     st.session_state["edit_mode"] = True
-                    st.experimental_rerun()
+                    st.rerun()
                 
                 if st.button("Remover", key=f"rem_{produto_id}"):
                     delete_produto(produto_id)
                     st.warning(f"Produto '{nome}' removido.")
-                    st.experimental_rerun()
+                    st.rerun()
 
     if "edit_mode" in st.session_state and st.session_state["edit_mode"]:
         show_edit_form()
@@ -137,6 +137,7 @@ def show_edit_form():
             update_produto(produto_id, nome, preco, quantidade, marca, estilo, tipo, photo_name)
             st.success("Produto atualizado com sucesso!")
             st.session_state["edit_mode"] = False
-            st.experimental_rerun()
+            st.rerun()
+
 
 gerenciar_produtos_page()
