@@ -25,7 +25,7 @@ def login_page():
                     st.success(f"Bem-vindo, {username}!")
                     st.session_state["logged_in"] = True
                     st.session_state["username"] = username
-                    st.experimental_rerun()
+                    st.rerun()
                 else:
                     st.error("Nome de usuário ou senha incorretos.")
             else:
@@ -47,5 +47,6 @@ def login_page():
                     hashed_password = hash_password(new_password)
                     add_user(new_username, hashed_password)
                     st.success("Administrador cadastrado com sucesso! Agora você pode fazer login.")
+
 
 login_page()
