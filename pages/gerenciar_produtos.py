@@ -1,5 +1,6 @@
 import streamlit as st
 import os
+from datetime import datetime
 from utils.database import add_produto, get_all_produtos, update_produto, delete_produto, get_produto_by_id
 
 # Definições de listas para os filtros
@@ -39,6 +40,7 @@ def add_product_form():
         marca = st.selectbox("Marca", MARCAS)
         estilo = st.selectbox("Estilo", ESTILOS)
         tipo = st.selectbox("Tipo de Produto", TIPOS)
+        data_validade = st.date_input("Data de Validade")
         
         foto = st.file_uploader("Adicionar Foto do Produto", type=["jpg", "png", "jpeg"])
 
@@ -52,7 +54,7 @@ def add_product_form():
                     with open(os.path.join("assets", photo_name), "wb") as f:
                         f.write(foto.getbuffer())
                 
-                add_produto(nome, preco, quantidade, marca, estilo, tipo, photo_name)
+                add_produto(nome, preco, quantidade, marca, estilo, tipo, photo_name, data_validade.isoformat())
                 st.success(f"Produto '{nome}' adicionado com sucesso!")
             else:
                 st.error("Por favor, preencha todos os campos obrigatórios (Nome, Preço, Quantidade).")
@@ -68,7 +70,7 @@ def manage_products_list():
 
     # Usando o st.expander para cada produto para um layout mais limpo
     for p in produtos:
-        produto_id, nome, preco, quantidade, marca, estilo, tipo, foto = p
+        produto_id, nome, preco, quantidade, marca, estilo, tipo, foto, data_validade = p
         
         with st.expander(f"**{nome}** - (ID: {produto_id})"):
             col_info, col_img, col_actions = st.columns([3, 1, 1])
@@ -79,6 +81,7 @@ def manage_products_list():
                 st.write(f"**Marca:** {marca}")
                 st.write(f"**Estilo:** {estilo}")
                 st.write(f"**Tipo:** {tipo}")
+                st.write(f"**Data de Validade:** {data_validade}")
 
             with col_img:
                 if foto and os.path.exists(os.path.join("assets", foto)):
@@ -124,6 +127,10 @@ def show_edit_form():
         estilo = st.selectbox("Estilo", ESTILOS, index=ESTILOS.index(produto_info[5]))
         tipo = st.selectbox("Tipo de Produto", TIPOS, index=TIPOS.index(produto_info[6]))
         
+        # Converte a string de data para um objeto datetime.date
+        data_validade = datetime.fromisoformat(produto_info[8]).date()
+        new_data_validade = st.date_input("Data de Validade", value=data_validade)
+        
         uploaded_file = st.file_uploader("Alterar Foto", type=["jpg", "png", "jpeg"])
         
         submit_update = st.form_submit_button("Salvar Alterações")
@@ -134,10 +141,9 @@ def show_edit_form():
                 with open(os.path.join("assets", photo_name), "wb") as f:
                     f.write(uploaded_file.getbuffer())
 
-            update_produto(produto_id, nome, preco, quantidade, marca, estilo, tipo, photo_name)
+            update_produto(produto_id, nome, preco, quantidade, marca, estilo, tipo, photo_name, new_data_validade.isoformat())
             st.success("Produto atualizado com sucesso!")
             st.session_state["edit_mode"] = False
             st.rerun()
-
 
 gerenciar_produtos_page()
